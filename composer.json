@@ -1,9 +1,7 @@
 {
     "name": "amerhendy/employers",
     "description": "nsscww Employers package",
-    "type": "library",
-	"license": "proprietary",
-	"version": "0.0.0",
+	"license": "MIT",
     "autoload": {
         "psr-4": {
             "Amerhendy\\Employers\\": "src/"
@@ -19,7 +17,6 @@
 	"require": 
 	{
 		"php": "^8.1",
-		"amerhendy/employment":"*"
 	},
 	"prefer-stable": true,
 	"config": 
