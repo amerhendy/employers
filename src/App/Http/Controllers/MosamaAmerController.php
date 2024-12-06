@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\DB;
 use \Amerhendy\Amer\App\Http\Controllers\Base\AmerController;
 use \Amerhendy\Amer\App\Helpers\Library\AmerPanel\AmerPanelFacade as AMER;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use \Amerhendy\Employers\App\Models\Mosama_Groups as Mosama_Groups;
 use \Amerhendy\Employers\App\Models\Mosama_Degrees as Mosama_Degrees;
 use \Amerhendy\Employers\App\Models\Mosama_Connections as Mosama_Connections;
@@ -14,97 +15,102 @@ use \Amerhendy\Employers\App\Models\Mosama_JobTitles as Mosama_JobTitles;
 use \Amerhendy\Employers\App\Models\Mosama_JobNames as Mosama_JobName;
 use \Amerhendy\Employers\App\Models\Mosama_OrgStruses as Mosama_OrgStru;
 use \Amerhendy\Employers\App\Models\Mosama_Tasks as Mosama_Tasks;
+use \Amerhendy\Employers\App\Http\Controllers\api\MosamaCollection;
 class MosamaAmerController extends AmerController
 {
+    use EmployerPrintTrait,EmployerTrait;
+    public static $returnType,$error,$request,$ids,$clearData,$dataWithRels,$pdfString,$listEmployers;
     function __invoke(){
-        return $this->index();
+        self::$error=new \stdClass();
+        self::$error->number=401;
+        self::$error->page=\Str::between(\Str::after(__FILE__,__DIR__),'\\','.php');
+        if(request()->ajax()){$returnType='json';}else{$returnType='html';}
+        if(self::checklogin() !== true){
+            if(self::$returnType === 'json'){}else{
+                return view('Amer::Errors.layout',['error_number'=>401]);
+            }
+        }
+        $route = \Route::currentRouteName();
+        if($route =='Mosama_print.index' || $route =='admin.Mosama_print.index'){
+            return $this->showprintjobname();
+        }elseif($route =='Mosama.index' || $route =='admin.Mosama.index'){
+            return $this->index();
+        }
+
+        if(self::$returnType === 'json'){}else{
+            return view('Amer::Errors.layout',['error_number'=>401]);
+        }
     }
-    function index(){
+    public static function checklogin()
+    {
         $login=0;
         $guards=config('auth.guards');
-        if(auth::guard(config('Amer.employers.auth.middleware_key'))->check()){
+        if(auth::guard(config('Amer.Employers.auth.middleware_key'))->check()){
             $login=1;
         }elseif(auth::guard(config('Amer.Security.auth.middleware_key'))->check()){
             $login=1;
         }
         if($login==0){
-            return view('errors.layout',['error_number'=>404,'error_message'=>__LINE__]);
+            return 405;
         }
-        $route = \Route::currentRouteName();
-        if($route =='Mosama_print.index' || $route =='admin.Mosama_print.index'){
-            return $this->showprintjobname();
-        }
-        if($route =='Mosama.index' || $route =='admin.Mosama.index'){
-            $data=[
-                'Mosama_Groups'=>Mosama_Groups::get(['id','text'])->toArray(),
-                'Mosama_Degrees'=>Mosama_Degrees::get(['id','text'])->toArray(),
-                'Mosama_Connections_in'=>Mosama_Connections::where('type','in')->get(['id','text'])->toArray(),
-                'Mosama_Connections_out'=>Mosama_Connections::where('type','out')->get(['id','text'])->toArray(),
-                'Mosama_Educations'=>Mosama_Educations::get(['id','text'])->toArray(),
-                'Mosama_Experiences'=>Mosama_Experiences::all()->toArray(),
-                'Mosama_Managers'=>Mosama_Managers::get(['id','text'])->toArray(),
-                'Mosama_JobTitles'=>Mosama_JobTitles::get(['id','text','Group_id'])->toArray(),
-                'Mosama_OrgStru'=>Mosama_OrgStru::get(['id','text'])->toArray(),
-                'Mosama_Tasks'=>Mosama_Tasks::get(['id','text','type'])->toArray(),
-            ];
-            $Mosama_JobName=Mosama_JobName::with(['Mosama_Tasks'=>function($q){return $q->select('Mosama_JobName_Tasks.Task_id');}])->with(['Mosama_Skills'=>function($q){return $q->select('Mosama_JobName_Skills.Skill_id');}])->with(['Mosama_OrgStruses'=>function($q){return $q->select('Mosama_JobName_OrgStru.OrgStru_id');}])->with(['Mosama_Experiences'=>function($q){return $q->select('Mosama_JobName_Experiences.Experience_id');}])->with(['Mosama_Educations'=>function($q){return $q->select('Mosama_JobName_Educations.Education_id');}])->with(['Mosama_Connections'=>function($q){return $q->select('Mosama_JobName_Connections.Connection_id');}])->with(['Mosama_Managers'=>function($q){return $q->select('Mosama_JobName_Managers.Manager_id');}])->get(['id','text','JobTitle_id','Degree_id','Group_id'])->toArray();
-            foreach($Mosama_JobName as $a=>$b){
-                $Mosama_JobName[$a]['Mosama_JobTitles'][0]=$b['JobTitle_id'];unset($Mosama_JobName[$a]['JobTitle_id']);
-                $Mosama_JobName[$a]['Mosama_Degrees'][0]=$b['Degree_id'];unset($Mosama_JobName[$a]['Degree_id']);
-                $Mosama_JobName[$a]['Mosama_Groups'][0]=$b['Group_id'];unset($Mosama_JobName[$a]['Group_id']);
-                $tasks=[];$skills=[];$managers=[];$orgstru=[];$exprer=[];$education=[];$connections=[];
-                if(count($b['mosama__tasks'])){foreach($b['mosama__tasks'] as $c=>$d){$tasks[]=$d['Task_id'];}}
-                unset($Mosama_JobName[$a]['mosama__tasks']);$Mosama_JobName[$a]['Mosama_Tasks']=$tasks;
-                if(count($b['mosama__skills'])){foreach($b['mosama__skills'] as $c=>$d){$skills[]=$d['Skill_id'];}}
-                unset($Mosama_JobName[$a]['mosama__skills']);$Mosama_JobName[$a]['Mosama_Skills']=$skills;
-                if(count($b['mosama__org_struses'])){foreach($b['mosama__org_struses'] as $c=>$d){$orgstru[]=$d['OrgStru_id'];}}
-                unset($Mosama_JobName[$a]['mosama__org_struses']);$Mosama_JobName[$a]['Mosama_OrgStru']=$orgstru;
-                if(count($b['mosama__experiences'])){foreach($b['mosama__experiences'] as $c=>$d){$exprer[]=$d['Experience_id'];}}
-                unset($Mosama_JobName[$a]['mosama__experiences']);$Mosama_JobName[$a]['Mosama_Experiences']=$exprer;
-                if(count($b['mosama__educations'])){foreach($b['mosama__educations'] as $c=>$d){$education[]=$d['Education_id'];}}
-                unset($Mosama_JobName[$a]['mosama__educations']);$Mosama_JobName[$a]['Mosama_Educations']=$education;
-                if(count($b['mosama__connections'])){foreach($b['mosama__connections'] as $c=>$d){$connections[]=$d['Connection_id'];}}
-                unset($Mosama_JobName[$a]['mosama__connections']);$Mosama_JobName[$a]['Mosama_Connections']=$connections;
-                if(count($b['mosama__managers'])){foreach($b['mosama__managers'] as $c=>$d){$managers[]=$d['Manager_id'];}}
-                unset($Mosama_JobName[$a]['mosama__managers']);$Mosama_JobName[$a]['Mosama_Managers']=$managers;
-            }
-            $data['Mosama_JobName']= $Mosama_JobName;
-            return view('Employers::Mosama',['data'=>$data,'load'=>'home']);
-        }
+        return true;
+    }
+    function index()
+    {
+        self::get('listAll');
+        $data=self::$listEmployers;
+        return view('Employers::Mosama',['data'=>$data,'load'=>'home']);
     }
     function showprintjobname($ids=null){
-        if(!isset($_POST['jobnameselect'])){return view('errors.layout',['error_number'=>404,'error_message'=>'NOIDS']);}
-            if($_POST['jobnameselect'] == ''){return view('errors.layout',['error_number'=>404,'error_message'=>'NOIDS']);}
-            $ids=$_POST['jobnameselect'];
-            sort($ids);
+        self::$request=request();
+        $validator=Validator::make(self::$request->all(),[
+            'selectshow'=>'required',
+            'jobnameselect'=>'required|array',
+        ]);
+        if($validator->fails()){
+
+            self::$error->message=$validator->messages();self::$error->line=__LINE__;
+            if(self::$returnType === 'json'){
+                return \AmerHelper::responseError(self::$error,self::$error->number);
+            }else{
+                return view('Amer::errors.layout',['error_number'=>504,'error_message'=>self::$error]);
+                }
+        }
+        self::$ids=self::$request->input('jobnameselect');
+        self::get($wanted='Mosama_JobNames');
+        self::attachRelsToMosama_JobNames();
+        self::PdfMosama_JobNames();
+        return view('Employers::Employers.ViewPdf',['pdf'=>self::$pdfString]);
+        dd(self::$pdfString);
             $mor=array_chunk($ids,100,true);
             $aunset=['Mosama_Tasks','Mosama_Skills','Mosama_OrgStru','Mosama_Goals','Mosama_Experiences','Mosama_Educations','Mosama_Connections','Mosama_Competencies','Mosama_Managers','Mosama_Groups','Mosama_Degrees','Mosama_JobTitles','Mosama_JobName'];
             $permessions=[];
-    if(!auth::guard('Employers')->user()) {
-    foreach($aunset as $a=>$b) {
-        $show=$b.'_show';
-        $update=$b.'_update';
-        $add=$b.'_add';
-        if(amer_user()->canper($show)) {
-            $permessions[]=$show;
+            if(!auth::guard('Employers')->user()) {
+            foreach($aunset as $a=>$b) {
+                $show=$b.'_show';
+                $update=$b.'_update';
+                $add=$b.'_add';
+                if(amer_user()->canper($show)) {
+                    $permessions[]=$show;
+                }
+                if(amer_user()->canper($update)) {
+                    $permessions[]=$update;
+                }
+                if(amer_user()->canper($add)) {
+                    $permessions[]=$add;
+                }
+            }
         }
-        if(amer_user()->canper($update)) {
-            $permessions[]=$update;
-        }
-        if(amer_user()->canper($add)) {
-            $permessions[]=$add;
-        }
-    }
-}
-            return view('Employers::print',['data'=>$mor,'permessions'=>$permessions]);
+        showprintjobname($ids);
+        return view('Employers::Employers.PDFprint',['data'=>$mor,'permessions'=>$permessions]);
         if(isset($_POST['jobnameselect'])){
             if($_POST['jobnameselect'] !== '') {
                 $ids=$_POST['jobnameselect'];
             }
         }
-        
+
         $mor=Mosama_JobName::whereIn('id',$ids)->with('Mosama_Tasks','Mosama_Skills','Mosama_OrgStru','Mosama_Goals','Mosama_Experiences','Mosama_Educations','Mosama_Connections','Mosama_Competencies','Mosama_Managers','Mosama_Groups','Mosama_Degrees','Mosama_JobTitles')->paginate(15)->toArray();
-        $aunset=['JobTitle_id','Group_id','Degree_id','created_at','updated_at','deleted_at'
+        $aunset=['jobtitle_id','group_id','degree_id','created_at','updated_at','deleted_at'
             ,'mosama__tasks'=>['created_at','updated_at','deleted_at','pivot']
             ,'mosama__skills'=>['created_at','updated_at','deleted_at','pivot']
             ,'mosama__org_stru'=>['created_at','updated_at','deleted_at','pivot']
@@ -118,7 +124,7 @@ class MosamaAmerController extends AmerController
             ,'mosama__degrees'=>['created_at','updated_at','deleted_at','pivot']
             ,'mosama__job_titles'=>['created_at','updated_at','deleted_at','pivot']
         ];
-        foreach($mor['data'] as $a=>$b){  
+        foreach($mor['data'] as $a=>$b){
             foreach($aunset as $c=>$d){
                 if(!is_array($d)){unset($mor[$a][$d]);}
                 else{
@@ -129,7 +135,7 @@ class MosamaAmerController extends AmerController
                         foreach($mor['data'][$a][$c] as $l=>$m){
                             unset($mor['data'][$a][$c][$l][$f]);
                         }}
-                        
+
                     }
                 }
             }

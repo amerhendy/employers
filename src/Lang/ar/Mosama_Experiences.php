@@ -3,7 +3,7 @@
  *  Created By Amer Hendy Language Consol For Laravel
  *      EGYPT -2023
  *     Mosama_Experiences
- * 
+ *
  * **********************************************************************************/
 return [
     'Mosama_Experiences'=>'الخبرات',
@@ -19,5 +19,5 @@ return [
     'LaravelTranslate'=>'يتطلب :type لمدة ( :year ) سنة',
     'type'=>'النوع',
     'years'=>'السنوات',
-    
+
 ];

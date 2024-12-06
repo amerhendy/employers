@@ -10,12 +10,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Mosama_Educations extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Mosama_Educations";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="mosama_educations";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -24,14 +23,6 @@ class Mosama_Educations extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -49,21 +40,21 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Mosama_Groups(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Groups_Educations",'Education_id','Group_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_groups_educations",'education_id','group_id')->withTrashed();
     }
-    function Mosama_Groups_Educations(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Educations",'id','id');
+    function mosama_groups_educations(){
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_educations",'id','id');
     }
     function Mosama_JobNames(){
-        return $this->belongsToMany(Mosama_JobNames::class,"Mosama_JobName_Educations",'Education_id','JobName_id')->withTrashed();
+        return $this->belongsToMany(Mosama_JobNames::class,"mosama_jobnames_educations",'education_id','jobname_id')->withTrashed();
     }
-    function Mosama_JobName_Educations(){
-        return $this->belongsToMany(Mosama_JobNames::class,"Mosama_Educations",'id','id');
+    function mosama_jobnames_educations(){
+        return $this->belongsToMany(Mosama_JobNames::class,"mosama_educations",'id','id');
     }
     function Mosama_JobTitles(){
-        return $this->belongsToMany(Mosama_JobTitles::class,"Mosama_JobTitles_Educations",'Education_id','JobTitle_id')->withTrashed();
+        return $this->belongsToMany(Mosama_JobTitles::class,"mosama_jobtitles_educations",'education_id','jobtitle_id')->withTrashed();
     }
-    function Mosama_JobTitles_Educations(){
-        return $this->belongsToMany(Mosama_JobTitles::class,"Mosama_Educations",'id','id');
+    function mosama_jobtitles_educations(){
+        return $this->belongsToMany(Mosama_JobTitles::class,"mosama_educations",'id','id');
     }
 }

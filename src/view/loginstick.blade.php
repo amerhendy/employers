@@ -4,6 +4,7 @@ $guards=config('auth.guards');
 @if(array_key_exists('Employers',$guards))
 <li><a class="dropdown-item" href="{{route('employerdashboard') }}"><i class="fa fa-users"></i>خدمات العاملين</a></li>
 @endif
+@error('uid') is-invalid @enderror
 <div id='employermenu' style="display:none">
     <li><a class="dropdown-item">{{ amer_auth()->user()->fullname ?? '' }}</a></li>
     <li><a class="dropdown-item" href="{{route('employerlogout-post') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();">{{ trans('SECLANG::auth.logout') }}</a></li>

@@ -10,7 +10,7 @@ use Laravel\Passport\HasApiTokens;
 class Employers extends Authenticatable
 {
   use HasApiTokens,HasFactory, Notifiable;
-  protected $table="Employers";
+  protected $table="employers";
     protected $guard = 'Employers';    
     protected $fillable = [
         'uid','nid',

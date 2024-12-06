@@ -10,12 +10,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Regulations_Articles extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Regulations_Articles";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="regulations_articles";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -24,14 +24,6 @@ class Regulations_Articles extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -49,12 +41,12 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
 function Regulations(){
-    return $this->belongsTo(Regulations::class,'Regulation_id','id')->withTrashed();
+    return $this->belongsTo(Regulations::class,'regulation_id','id')->withTrashed();
 }
 function Regulations_Topics(){
-    return $this->belongsToMany(Regulations_Topics::class,"Regulations_topic_article",'Article_id','Topic_id')->withTrashed();
+    return $this->belongsToMany(Regulations_Topics::class,"Regulations_topic_article",'article_id','topic_id')->withTrashed();
 }
 function Regulations_topic_article(){
-    return $this->belongsToMany(Regulations_Topics::class,"Regulations_Articles",'id','id');
+    return $this->belongsToMany(Regulations_Topics::class,"regulations_articles",'id','id');
 }
 }

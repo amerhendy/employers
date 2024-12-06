@@ -10,12 +10,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Regulations extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Regulations";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="regulations";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -24,14 +24,6 @@ class Regulations extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -49,6 +41,6 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Regulations_Articles(){
-        return $this->hasMany(Regulations_Articles::class,'Regulation_id','id')->withTrashed();
+        return $this->hasMany(Regulations_Articles::class,'regulation_id','id')->withTrashed();
     }
 }

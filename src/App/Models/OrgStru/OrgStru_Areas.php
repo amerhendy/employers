@@ -9,28 +9,18 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class OrgStru_Areas extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table = 'OrgStru_Areas';
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table = "orgstru_areas";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = true;
     protected $fillable = [];
     protected $dates = ['deleted_at'];
-    public static $list=[];
-    public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -48,12 +38,12 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function OrgStru_Sections(){
-        return $this->belongsTo(OrgStru_Sections::class,'Section_id','id')->withTrashed();
+        return $this->belongsTo(OrgStru_Sections::class,'section_id','id')->withTrashed();
     }
     function OrgStru_Types(){
-        return $this->belongsToMany(OrgStru_Types::class,"OrgStru_Areas_Types",'Area_id','Type_id')->withTrashed();
+        return $this->belongsToMany(OrgStru_Types::class,"orgstru_areas_types",'area_id','type_id')->withTrashed();
     }
-    function OrgStru_Areas_Types(){
-        return $this->belongsToMany(OrgStru_Types::class,"OrgStru_Areas",'id','id');
+    function orgstru_areas_types(){
+        return $this->belongsToMany(OrgStru_Types::class,"orgstru_areas",'id','id');
     }
 }

@@ -9,8 +9,8 @@ use Amerhendy\Employers\App\Http\Requests\Mosama_ExperiencesRequest as Mosama_Ex
 class Mosama_ExperiencesAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -18,13 +18,12 @@ class Mosama_ExperiencesAmerController extends AmerController
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkCloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkDeleteOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation; 
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation;
     public function setup()
     {
         AMER::setModel(Mosama_Experiences::class);
-        AMER::setRoute(config('Amer.employers.employers.route_prefix') . '/Mosama_Experiences');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Mosama_Experiences');
         AMER::setEntityNameStrings(trans('EMPLANG::Mosama_Experiences.singular'), trans('EMPLANG::Mosama_Experiences.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Mosama_Experiences.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Mosama_Experiences.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Mosama_Experiences.create'), 'create');
@@ -34,12 +33,11 @@ class Mosama_ExperiencesAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Mosama_Experiences-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Mosama_Experiences-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Mosama_Experiences-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Mosama_Experiences-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Mosama_Experiences-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Mosama_Experiences-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
     protected function setupShowOperation()
     {
@@ -63,7 +61,7 @@ class Mosama_ExperiencesAmerController extends AmerController
                 'prefix'=>'عدد(',
                 'suffix'=>') سنة',
                 'wrapper'=>[]
-                
+
             ],
             [
                 'label'=>trans('EMPLANG::Mosama_Groups.singular'),
@@ -101,7 +99,7 @@ class Mosama_ExperiencesAmerController extends AmerController
                     'prefix'=>'عدد(',
                     'suffix'=>') سنة',
                     'wrapper'=>[]
-                    
+
                 ]
             ]);
             $routes=$this->Amer->routelist;
@@ -118,7 +116,6 @@ class Mosama_ExperiencesAmerController extends AmerController
                     'attribute'=>'text',
                     'pivot'=>true,
                     'select_all'=>true,
-                    'include_all_form_fields' => true,
                 ],
                 [
                     'type'=>'select2_from_ajax',
@@ -133,8 +130,8 @@ class Mosama_ExperiencesAmerController extends AmerController
                     'select_all'=>true,
                     'include_all_form_fields' => true,
                     'dependencies'            => ['Mosama_Groups'],
-                ], 
-                ]); 
+                ],
+                ]);
     }
     protected function setupCreateOperation()
     {
@@ -145,17 +142,6 @@ class Mosama_ExperiencesAmerController extends AmerController
     {
         AMER::setValidation(Mosama_ExperiencesRequest::class);
         $this->fields();
-    }
-    public function store(Mosama_ExperiencesRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     public function destroy($id)
     {
@@ -171,16 +157,17 @@ class Mosama_ExperiencesAmerController extends AmerController
     {
         $model=\Amerhendy\Employers\App\Models\Mosama_JobNames::class;
         $text='Mosama_Groups';
-        $result=\AmerHelper::retunFetchValue($_GET,$text);
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
             'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
             'query' => function($model)use($result,$text) {
                 return $model->whereHas($text,function($q)use($result,$text){
-                    return $q->whereIn($text.'.id',$result);
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
     }
 }

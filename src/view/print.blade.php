@@ -60,7 +60,7 @@
                                 <div class='col-sm-2' id='Mosama_Degrees_TITLE_{PageId}'>الدرجة: </div>
                                 <div class='col-sm border-bottom' id="Mosama_Degrees_TEXT_{PageId}" >
                                     {Mosama_Degrees}
-                                </div>    
+                                </div>
                                 <div class='col-sm-2' id='Mosama_Managers_TITLE_{PageId}'>المسئول المباشر :   </div>
                                 <div class='col-sm border-bottom' id="Mosama_Managers_TEXT_{PageId}" >
                                     {Mosama_Managers}
@@ -159,7 +159,7 @@
                                 <div class='col-sm-12 text-center'>
                                     <b>شروط شغل الوظيفة</b>
                                 </div>
-                            </div>  
+                            </div>
                             <div class='row text-right' id='newline'>
                                 <div class='col-sm-3' id='Mosama_Educations_TITLE_{PageId}'>المؤهل الدراسى: </div>
                                 <div class='col-sm-9 border-bottom' id="Mosama_Educations_TEXT_{PageId}" >
@@ -202,6 +202,7 @@
     if($route =='admin.Mosama_print.index'){
         $acroute=route('admin.showprintjobname');
     }
+    dd($acroute);
     ?>
 <script>
     function view_noty(type, val) {
@@ -220,6 +221,6 @@
             var timenow="{{Carbon\Carbon::now()->toDateTimeString()}}";
             var homelink="{{url('/')}}";
         </script>
-        <script title="" type="application/javascript" src="{{asset('js/printpop.js')}}" defer></script>
+        <script title="" type="application/javascript" src="{{asset('js/employment/printpop.js')}}" defer></script>
 </body>
 </html>

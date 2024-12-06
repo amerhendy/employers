@@ -40,11 +40,12 @@ return new class extends Migration
             'Mosama_JobTitles_Competencies'=>['JobTitle_id'=>'Mosama_JobTitles','Competence_id'=>'Mosama_Competencies'], //
             'Mosama_JobTitles_Connections'=>['JobTitle_id'=>'Mosama_JobTitles','Connection_id'=>'Mosama_Connections'], //
             'Mosama_JobTitles_Educations'=>['JobTitle_id'=>'Mosama_JobTitles','Education_id'=>'Mosama_Educations'], //
-            'Mosama_JobTitles_Goals'=>['JobTitle_id'=>'Mosama_JobTitles','Goal_id'=>'Mosama_Goals'],// 
+            'Mosama_JobTitles_Goals'=>['JobTitle_id'=>'Mosama_JobTitles','Goal_id'=>'Mosama_Goals'],//
             'Mosama_JobTitles_Managers'=>['JobTitle_id'=>'Mosama_JobTitles','Manager_id'=>'Mosama_Managers'], //
             'Mosama_JobTitles_OrgStru'=>['JobTitle_id'=>'Mosama_JobTitles','OrgStru_id'=>'Mosama_OrgStruses'], //
             'Mosama_JobTitles_Skill'=>['JobTitle_id'=>'Mosama_JobTitles','Skill_id'=>'Mosama_Skills'], //
             'Mosama_JobTitles_Tasks'=>['JobTitle_id'=>'Mosama_JobTitles','Task_id'=>'Mosama_Tasks'],//
+            'Mosama_JobTitles_degrees'=>['JobTitle_id'=>'Mosama_JobTitles','degree_id'=>'mosama_degrees'],//
             'OrgStru_Areas_Types'=>['Area_id'=>'OrgStru_Areas','Type_id'=>'OrgStru_Types'],
             'Regulations_topic_article'=>['Topic_id'=>'Regulations_Topics','Article_id'=>'Regulations_Articles'],
             'Regulations_Regulation_Topic'=>['Regulation_id'=>'Regulations','Topic_id'=>'Regulations_Topics'],
@@ -58,7 +59,7 @@ return new class extends Migration
                 }
                 $table->timestamps();
                 $table->softDeletes();
-            });    
+            });
         }
     }
     public function setupComplecated(){

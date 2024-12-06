@@ -8,8 +8,8 @@ use Amerhendy\Employers\App\Http\Requests\OrgStru_SectionsRequest as OrgStru_Sec
 class OrgStru_SectionsAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -21,9 +21,8 @@ class OrgStru_SectionsAmerController extends AmerController
     public function setup()
     {
         AMER::setModel(OrgStru_Sections::class);
-        AMER::setRoute(config('amer.route_prefix') . '/OrgStru_Sections');
+        AMER::setRoute(config('Amer.Amer.route_prefix') . '/OrgStru_Sections');
         AMER::setEntityNameStrings(trans('EMPLANG::OrgStru_Sections.singular'), trans('EMPLANG::OrgStru_Sections.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::OrgStru_Sections.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::OrgStru_Sections.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::OrgStru_Sections.create'), 'create');
@@ -33,12 +32,11 @@ class OrgStru_SectionsAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('OrgStru_Sections-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('OrgStru_Sections-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('OrgStru_Sections-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('OrgStru_Sections-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('OrgStru_Sections-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('OrgStru_Sections-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
 
     protected function setupListOperation(){
@@ -88,17 +86,6 @@ class OrgStru_SectionsAmerController extends AmerController
     {
         AMER::setValidation(OrgStru_SectionsRequest::class);
         $this->groupfields();
-    }
-    public function store(OrgStru_SectionsRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     public function destroy($id)
     {

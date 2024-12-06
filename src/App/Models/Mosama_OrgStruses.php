@@ -10,12 +10,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Mosama_OrgStruses extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Mosama_OrgStruses";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="mosama_orgstruses";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -24,14 +24,6 @@ class Mosama_OrgStruses extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -49,22 +41,29 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Mosama_Groups(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Groups_OrgStru",'OrgStru_id','Group_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_groups_orgstrus",'orgstru_id','group_id')->withTrashed();
     }
-    function Mosama_Groups_OrgStru(){
+    function mosama_groups_orgstrus(){
         return $this->belongsToMany(Mosama_Groups::class,"Mosama_OrgStruses",'id','id');
     }
     function Mosama_JobNames(){
-        return $this->belongsToMany(Mosama_JobNames::class,"Mosama_JobName_OrgStru",'OrgStru_id','JobName_id')->withTrashed();
+        return $this->belongsToMany(Mosama_JobNames::class,"mosama_jobnames_orgstrus",'orgstru_id','jobname_id')->withTrashed();
     }
-    function Mosama_JobName_OrgStru(){
+    function mosama_jobnames_orgstrus(){
         return $this->belongsToMany(Mosama_JobNames::class,"Mosama_OrgStruses",'id','id');
     }
     function Mosama_JobTitles(){
-        return $this->belongsToMany(Mosama_JobTitles::class,"Mosama_JobTitles_OrgStru",'OrgStru_id','JobTitle_id')->withTrashed();
+        return $this->belongsToMany(Mosama_JobTitles::class,"mosama_jobtitles_orgstrus",'orgstru_id','jobtitle_id')->withTrashed();
     }
-    function Mosama_JobTitles_OrgStru(){
+    function mosama_jobtitles_orgstrus(){
         return $this->belongsToMany(Mosama_JobTitles::class,"Mosama_OrgStruses",'id','id');
     }
-    
+    public function fulltext(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value, array $attributes){
+                return __('EMPLANG::mosama.Mosama_OrgStru.'.$attributes['type']).": ".$attributes['text'];
+            }
+        );
+    }
 }

@@ -3,31 +3,31 @@ namespace Amerhendy\Employers;
 //composer update
 //composer dump-autoload
 //php artisan vendor:publish
+use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Config;
 use Amerhendy\Employment\App\Helpers\AmerHelper;
 use Amerhendy\Employment\App\Helpers\Library\AmerPanel\AmerPanel;
 use Amerhendy\Employment\App\Helpers\Library\AmerPanel\AmerPanelFacade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Collection;  
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\File;
 class EmployersServiceProvider extends ServiceProvider
 {
-    
+    use \Amerhendy\Amer\App\Helpers\Library\Database\PublishesMigrations;
     public $startcomm="Amer";
     protected $commands = [];
     protected $defer = false;
-    public $pachaPath="Amerhendy\Employers\\";
-
-
+    public static $pachaPath="Amerhendy\Employers\\";
+    public static $config;
     /**
      * Register services.
      */
     public function register(): void
     {
-        require_once __DIR__.'/macro.php';   
+        require_once __DIR__.'/macro.php';
     }
 
     /**
@@ -35,30 +35,94 @@ class EmployersServiceProvider extends ServiceProvider
      */
     public function boot(Router $router): void
     {
-        $path=base_path('vendor/AmerHendy/Employers/src/');
         $this->loadConfigs();
-        $this->loadMigrationsFrom($path.'database/migrations');
-        $this->loadroutes($this->app->router);
+        self::$config=Config('Amer.Employers');
+        if(Config('Amer.Employers.package_path')){
+            self::$pachaPath=cleanDir(Config('Amer.Employers.package_path'));
+        }else{
+            self::$pachaPath=cleanDir(__DIR__);
+        }
+        $this->loadViewsFrom(cleanDir([self::$pachaPath,'view']), 'Employers');
+        $this->loadTranslationsFrom(cleanDir([self::$pachaPath,"lang"]), 'EMPLANG');
+        $this->registerMigrations(cleanDir([self::$pachaPath,"database",'migrations']));
         $this->loadGuards();
         $this->registerMiddlewareGroup($this->app->router);
-        $this->loadTranslationsFrom(__DIR__.'/Lang','EMPLANG');
-        $this->loadViewsFrom($path.'/view', 'Employers');
+        $this->loadroutes($this->app->router);
+        /*
         $this->addmainmenu();
-        $this->publishfiles();
+        */
     }
     public function loadConfigs(){
-        foreach(getallfiles(__DIR__.'/config/') as $file){
-            $this->mergeConfigFrom($file,Str::replace('/','.',Str::afterLast(Str::remove('.php',$file),'config/')),'employersconfig');
+        foreach(getallfiles(__DIR__.'/config') as $file){
+            if(!Str::contains($file, 'config'.DIRECTORY_SEPARATOR."Amer".DIRECTORY_SEPARATOR)){
+                $name=Str::afterLast(Str::remove('.php',$file),'config'.DIRECTORY_SEPARATOR);
+            }else{
+                $name='Amer.'.ucfirst(Str::afterLast(Str::remove('.php',$file),'config'.DIRECTORY_SEPARATOR."Amer".DIRECTORY_SEPARATOR));
+            }
+
+            $this->mergeConfigFrom(
+                $file,$name
+            );
         }
+    }
+    public function loadGuards(){
+        $b=config('Amer.Employers.auth');
+        $name=$b['middleware_key'];
+        $model=$b['model'];
+        app()->config['auth.guards'] = app()->config['auth.guards'] +
+                [
+                    $name => [
+                        'driver'   => 'session',
+                        'provider' => $name,
+                    ],
+                ];
+                app()->config['auth.providers'] = app()->config['auth.providers'] +
+                [
+                    $name => [
+                        'driver'  => 'eloquent',
+                        'model'   => $model,
+                    ],
+                ];
+    }
+    public function registerMiddlewareGroup(Router $router)
+    {
+        $b=config('Amer.Employers.auth');
+        $name=$b['middleware_key'];
+        $model=$b['model'];
+            $middleware_key = $b['middleware_key'];
+            $middleware_class = $b['middleware_class'];
+            if (! is_array($middleware_class)) {
+                $router->pushMiddlewareToGroup($middleware_key, $middleware_class);
+                return;
+            }
+            foreach ($middleware_class as $middleware_class) {
+                $router->pushMiddlewareToGroup($middleware_key, $middleware_class);
+            }
     }
     public function loadroutes(Router $router)
     {
-        $packagepath=base_path('vendor/AmerHendy/Employers/src/');
-        $routepath=$this->getallfiles($packagepath.'/Route/');
+        $routepath=getallfiles(cleanDir([self::$pachaPath,'route']));
         foreach($routepath as $path){
-            $this->loadRoutesFrom($path);
+            if(!\Str::contains($path, 'api.php')){
+                $this->loadRoutesFrom($path);
+            }else{
+                Route::group($this->apirouteConfiguration(), function () use($path){
+                    $this->loadRoutesFrom($path);
+                });
+            }
         }
     }
+    protected function apirouteConfiguration()
+    {
+        return [
+            'prefix' =>'api/'.config('Amer.Amer.api_version')??'v1',
+            'middleware' => 'client',
+            'name'=>(config('Amer.Employers.routeName_prefix') ?? 'amer').'Api',
+            'namespace'  =>config('Amer.Employers.Controllers','\\Amerhendy\Employers\App\Http\Controllers'),
+            //'namespace'  =>\Str::finish(config('Amer.Employers.Controllers','\\Amerhendy\Employers\App\Http\Controllers\\'),'\\'),
+        ];
+    }
+
     public function addmainmenu(){
         $sidelayout_path=resource_path('views/vendor/Amer/Base/inc/menu/mainmenu.blade.php');
         $file_lines=File::lines($sidelayout_path);
@@ -82,18 +146,13 @@ class EmployersServiceProvider extends ServiceProvider
             }else{
                     return strpos($k, $needle) !== false;
             }
-            
+
         });
-        if ($matchingLines) { 
+        if ($matchingLines) {
             return array_key_last($matchingLines);
         }
 
         return false;
-    }   
-    function publishfiles(){
-        $pb=config('Amer.employers.package_path') ?? __DIR__;
-        $config_files = [$pb.'/config' => config_path()];
-        //$this->publishes($inputs, $this->startcomm.':EmployerIpnuts');
     }
     function getallfiles($path){
         $files = array_diff(scandir($path), array('.', '..'));
@@ -110,38 +169,5 @@ class EmployersServiceProvider extends ServiceProvider
         }
         return $out;
     }
-    public function loadGuards(){
-        $b=config('Amer.employers.auth');
-        $name=$b['middleware_key'];
-        $model=$b['model'];
-        app()->config['auth.guards'] = app()->config['auth.guards'] +
-                [
-                    $name => [
-                        'driver'   => 'session',
-                        'provider' => $name,
-                    ],
-                ];
-                app()->config['auth.providers'] = app()->config['auth.providers'] +
-                [
-                    $name => [
-                        'driver'  => 'eloquent',
-                        'model'   => $model,
-                    ],
-                ];
-    }
-    public function registerMiddlewareGroup(Router $router)
-    {
-        $b=config('Amer.employers.auth');
-        $name=$b['middleware_key'];
-        $model=$b['model'];
-            $middleware_key = $b['middleware_key'];
-            $middleware_class = $b['middleware_class'];
-            if (! is_array($middleware_class)) {
-                $router->pushMiddlewareToGroup($middleware_key, $middleware_class);
-                return;
-            }
-            foreach ($middleware_class as $middleware_class) {
-                $router->pushMiddlewareToGroup($middleware_key, $middleware_class);
-            }
-    }
+
 }

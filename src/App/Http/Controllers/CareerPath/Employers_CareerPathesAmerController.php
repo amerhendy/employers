@@ -9,8 +9,8 @@ use \Amerhendy\Employers\App\Http\Requests\CareerPath\Employers_CareerPathesRequ
 class Employers_CareerPathesAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -29,9 +29,8 @@ class Employers_CareerPathesAmerController extends AmerController
             ]);
         }*/
         AMER::setModel(Employers_CareerPathes::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Employers_CareerPathes');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Employers_CareerPathes');
         AMER::setEntityNameStrings(trans('EMPLANG::Employers_CareerPathes.singular'), trans('EMPLANG::Employers_CareerPathes.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Employers_CareerPathes.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Employers_CareerPathes.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Employers_CareerPathes.create'), 'create');
@@ -41,12 +40,11 @@ class Employers_CareerPathesAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Employers_CareerPathes-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Employers_CareerPathes-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Employers_CareerPathes-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Employers_CareerPathes-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Employers_CareerPathes-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Employers_CareerPathes-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
     protected function setupShowOperation()
     {
@@ -88,7 +86,7 @@ class Employers_CareerPathesAmerController extends AmerController
                 'pivot'=>true,
                 'select_all'=>true,
             ]
-                ]); 
+                ]);
     }
     protected function setupCreateOperation()
     {
@@ -99,17 +97,6 @@ class Employers_CareerPathesAmerController extends AmerController
     {
         AMER::setValidation(Employers_CareerPathesRequest::class);
         $this->fields();
-    }
-    public function store(Employers_CareerPathesRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     public function destroy($id)
     {

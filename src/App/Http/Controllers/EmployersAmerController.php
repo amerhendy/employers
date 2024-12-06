@@ -9,8 +9,8 @@ use \Amerhendy\Employers\App\Http\Requests\EmployersRequest as EmployersRequest;
 class EmployersAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation{ update as traitUpdate; }
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -29,9 +29,8 @@ class EmployersAmerController extends AmerController
             ]);
         }*/
         AMER::setModel(Employers::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Employers');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Employers');
         AMER::setEntityNameStrings(trans('EMPLANG::Employers.singular'), trans('EMPLANG::Employers.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Employers.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Employers.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Employers.create'), 'create');
@@ -41,12 +40,11 @@ class EmployersAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Employers-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Employers-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Employers-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Employers-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Employers-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Employers-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
     protected function setupShowOperation()
     {
@@ -99,7 +97,7 @@ class EmployersAmerController extends AmerController
     function fields(){
             $routes=$this->Amer->routelist;
         AMER::addFields([
-            
+
             [
                 'name'=>'uid',
                 'type'=>'text',
@@ -138,13 +136,13 @@ class EmployersAmerController extends AmerController
                 'model'=>\Amerhendy\Employers\App\Models\Mosama_Degrees::class,
                 'label'=>trans('EMPLANG::Mosama_Degrees.singular'),
             ],
-            
-                ]); 
+
+                ]);
     }
     protected function gettrainers(){
         $db=Employers::distinct()->get('Trainer');
         if($db){
-           return $db->pluck('Trainer')->toArray(); 
+           return $db->pluck('Trainer')->toArray();
         }
         return[];
     }
@@ -157,17 +155,6 @@ class EmployersAmerController extends AmerController
     {
         AMER::setValidation(EmployersRequest::class);
         $this->fields();
-    }
-    public function store(EmployersRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     function update(EmployersRequest $request){
         $response = $this->traitUpdate();
@@ -198,7 +185,7 @@ class EmployersAmerController extends AmerController
                 return $model->whereHas($text,function($q)use($result,$text){
                     return $q->where($text.'.id',$result);
                 });
-            } 
+            }
         ]);
     }
     public function fetchEmployers_CareerPathFiles(){
@@ -214,11 +201,11 @@ class EmployersAmerController extends AmerController
                 return $model->whereHas($text,function($q)use($result,$text){
                     return $q->where($text.'.id',$result);
                 });
-            } 
+            }
         ]);
     }
     public function fetchEmployers(){
-        
+
         $text='JobNames_id';
         $result=\AmerHelper::retunFetchValue($_GET,$text);
         $model=\Amerhendy\Employers\App\Models\Mosama_JobNames::class;
@@ -233,7 +220,7 @@ class EmployersAmerController extends AmerController
             //'paginate' => 10,
             'query' => function($model)use($Mosama_JobTitles,$Mosama_Degrees,$text) {
                 return $model->where('Mosama_JobTitles',$Mosama_JobTitles);
-            } 
+            }
         ]);
     }
 }

@@ -10,11 +10,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Employers extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
     protected $table ="Employers";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
@@ -22,14 +22,6 @@ class Employers extends Model
     public $timestamps = true;
     protected $fillable = [];
     protected $dates = ['deleted_at'];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -47,18 +39,18 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Mosama_Groups(){
-        return $this->belongsTo(\Amerhendy\Employers\App\Models\Mosama_Groups::class,'Group_id','id')->withTrashed();
+        return $this->belongsTo(\Amerhendy\Employers\App\Models\Mosama_Groups::class,'group_id','id')->withTrashed();
     }
     function Mosama_JobTitles(){
-        return $this->belongsTo(\Amerhendy\Employers\App\Models\Mosama_JobTitles::class,'JobTitle_id','id')->withTrashed();
+        return $this->belongsTo(\Amerhendy\Employers\App\Models\Mosama_JobTitles::class,'jobtitle_id','id')->withTrashed();
     }
     function Mosama_Degrees(){
-        return $this->belongsTo(\Amerhendy\Employers\App\Models\Mosama_Degrees::class,'Degree_id','id')->withTrashed();
+        return $this->belongsTo(\Amerhendy\Employers\App\Models\Mosama_Degrees::class,'degree_id','id')->withTrashed();
     }
     function Employers_trainings(){
         return $this->belongsToMany(\Amerhendy\Employers\App\Models\CareerPath\Employers_trainings::class,"Employers_training",'Employer_id','training_id')->withTrashed();
     }
     function Employers_training(){
-        return $this->belongsToMany(\Amerhendy\Employers\App\Models\CareerPath\Employers_trainings::class,"Employers",'id','id');
+        return $this->belongsToMany(\Amerhendy\Employers\App\Models\CareerPath\Employers_trainings::class,"employers",'id','id');
     }
 }

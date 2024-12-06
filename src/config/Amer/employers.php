@@ -1,8 +1,4 @@
 <?php
-$sources=[
-    'images'=>'images',
-];
-
 return [
     'route_prefix' => 'Employers',
     'routeName_prefix'=>'Employers',

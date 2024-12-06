@@ -10,12 +10,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Employers_CareerPathes extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Employers_CareerPathes";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="employers_careerpathes";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -52,7 +52,7 @@ public function sluggable(): array
         return $this->belongsToMany(\Amerhendy\Employers\App\Models\Mosama_Groups::class,"Employers_CareerPathes",'id','id');
     }
     function Mosama_Groups(){
-        return $this->belongsToMany(\Amerhendy\Employers\App\Models\Mosama_Groups::class,"Mosama_Groups_CareerPath",'CareerPath_id','Group_id')->withTrashed();
+        return $this->belongsToMany(\Amerhendy\Employers\App\Models\Mosama_Groups::class,"Mosama_Groups_CareerPath",'CareerPath_id','group_id')->withTrashed();
     }
     function Employers_CareerPathes_Files(){
         return $this->belongsToMany(\Amerhendy\Employers\App\Models\CareerPath\Employers_CareerPathFiles::class,"Employers_CareerPathes",'id','id');

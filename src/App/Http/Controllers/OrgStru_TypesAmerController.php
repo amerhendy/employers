@@ -8,8 +8,8 @@ use Amerhendy\Employers\App\Http\Requests\OrgStru_TypesRequest as OrgStru_TypesR
 class OrgStru_TypesAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -21,9 +21,8 @@ class OrgStru_TypesAmerController extends AmerController
     public function setup()
     {
         AMER::setModel(OrgStru_Types::class);
-        AMER::setRoute(config('amer.route_prefix') . '/OrgStru_Types');
+        AMER::setRoute(config('Amer.Amer.route_prefix') . '/OrgStru_Types');
         AMER::setEntityNameStrings(trans('EMPLANG::OrgStru_Types.singular'), trans('EMPLANG::OrgStru_Types.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::OrgStru_Types.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::OrgStru_Types.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::OrgStru_Types.create'), 'create');
@@ -33,12 +32,11 @@ class OrgStru_TypesAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('OrgStru_Types-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('OrgStru_Types-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('OrgStru_Types-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('OrgStru_Types-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('OrgStru_Types-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('OrgStru_Types-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
 
     protected function setupListOperation(){
@@ -49,7 +47,7 @@ class OrgStru_TypesAmerController extends AmerController
                 'label'=>trans('EMPLANG::OrgStru_Types.singular'),
             ],
         ]);
-        
+
     }
     function groupfields(){
         AMER::addFields([
@@ -73,17 +71,6 @@ class OrgStru_TypesAmerController extends AmerController
     {
         AMER::setValidation(OrgStru_TypesRequest::class);
         $this->groupfields();
-    }
-    public function store(OrgStru_TypesRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     public function destroy($id)
     {
@@ -131,10 +118,10 @@ class OrgStru_TypesAmerController extends AmerController
     {
         return $this->fetch(['model'=>\Amerhendy\Employers\App\Models\Mosama_Skills::class,'searchable_attributes'=>'text']);
     }
-    
+
     public function fetchMosama_Tasks()
     {
         return $this->fetch(['model'=>\Amerhendy\Employers\App\Models\Mosama_Tasks::class,'searchable_attributes'=>'text']);
     }
-    
+
 }

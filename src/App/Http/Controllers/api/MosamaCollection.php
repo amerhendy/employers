@@ -38,10 +38,10 @@ class MosamaCollection extends Controller
         //return Mosama_JobTitles::with('Mosama_Groups')->get();
         //return Mosama_Goals::with('Mosama_Degrees')->get();
         //return Mosama_Groups::with('Mosama_JobTitles')->get();
-        
-       //return ''; 
-        
-        
+
+       //return '';
+
+
         //return Mosama_Groups::with('Mosama_Degrees')->get();
         //return Mosama_Groups::with('Mosama_Educations')->get();
         //return Mosama_Groups::with('Mosama_Connections')->get();
@@ -88,7 +88,7 @@ class MosamaCollection extends Controller
                 }else{
                     $text=" مدة كلية قدرها ".$b['time']." سنة في نفس مجال العمل .";
                 }
-                
+
                 $Data[$a]=['id'=>$b['id'],'type'=>$b['type'],'time'=>$b['time'],'text'=>$text];
             }
             return ['data'=>$Data];
@@ -96,7 +96,7 @@ class MosamaCollection extends Controller
         else{
             return ['data'=>$type->get(['id','text'])->toArray()];
         }
-        
+
     }
     private static function getclass($target){
         if($target == "Mosama_Goals"){$class=new Mosama_Goals();}
@@ -137,7 +137,7 @@ class MosamaCollection extends Controller
         $class=self::getclass($target);
         $classTable=$class->getTable();
         $classTableSearchCols=[];
-        
+
         foreach(DB::getSchemaBuilder()->getColumnListing($classTable) as $a=>$b){
             if(!in_array($b,['id','created_at','updated_at','deleted_at'])){$classTableSearchCols[]=$b;}
         }
@@ -165,7 +165,7 @@ class MosamaCollection extends Controller
                 }
             }
         }
-        
+
         $recordsFiltered=$records->count();
         if(count($with)!==0){
             foreach($with as $a=>$b){
@@ -174,7 +174,7 @@ class MosamaCollection extends Controller
                 }]);
             }
         }
-        
+
        // $start=67;
         $records
         //->select()
@@ -184,7 +184,7 @@ class MosamaCollection extends Controller
        //return $records->get();
        if(count($with)){
         foreach($with as $b){
-            $cols[]=$b;  
+            $cols[]=$b;
         }
        }
        $data_arr = array();
@@ -201,9 +201,9 @@ class MosamaCollection extends Controller
                         $newTargetColsArray[]=$f[$d['Targetcols']];
                 }
                 }
-                
-   //$newTargetColsArray[]= $b[$d['targetClass']][$d['Targetcols']];
-                    
+
+        //$newTargetColsArray[]= $b[$d['targetClass']][$d['Targetcols']];
+
                 $data_arr[$a][]= $newTargetColsArray;
             }
         }
@@ -215,7 +215,7 @@ class MosamaCollection extends Controller
            "data" => $data_arr
          );
          return json_encode($response);
-         
+
         return $records->get();
 
     }
@@ -243,7 +243,7 @@ class MosamaCollection extends Controller
             ,'mosama__degrees'=>['created_at','updated_at','deleted_at','pivot']
             ,'mosama__job_titles'=>['created_at','updated_at','deleted_at','pivot']
         ];
-        foreach($mor as $a=>$b){  
+        foreach($mor as $a=>$b){
             foreach($aunset as $c=>$d){
                 if(!is_array($d)){unset($mor[$a][$d]);}
                 else{
@@ -254,7 +254,7 @@ class MosamaCollection extends Controller
                         foreach($mor[$a][$c] as $l=>$m){
                             unset($mor[$a][$c][$l][$f]);
                         }}
-                        
+
                     }
                 }
             }

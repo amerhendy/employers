@@ -9,8 +9,8 @@ use \Amerhendy\Employers\App\Http\Requests\Mosama_CompetenciesRequest as Mosama_
 class Mosama_CompetenciesAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -22,9 +22,8 @@ class Mosama_CompetenciesAmerController extends AmerController
     public function setup()
     {
         AMER::setModel(Mosama_Competencies::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Mosama_Competencies');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Mosama_Competencies');
         AMER::setEntityNameStrings(trans('EMPLANG::Mosama_Competencies.singular'), trans('EMPLANG::Mosama_Competencies.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Mosama_Competencies.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Mosama_Competencies.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Mosama_Competencies.create'), 'create');
@@ -34,12 +33,11 @@ class Mosama_CompetenciesAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Mosama_Competencies-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Mosama_Competencies-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Mosama_Competencies-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Mosama_Competencies-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Mosama_Competencies-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Mosama_Competencies-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
     protected function setupShowOperation()
     {
@@ -77,55 +75,53 @@ class Mosama_CompetenciesAmerController extends AmerController
         ]);
     }
     function fields(){
-            $routes=$this->Amer->routelist;
+        $routes=$this->Amer->routelist;
+        AMER::addField([
+            'name'=>'text',
+            'type'=>'text',
+            'label'=>trans('EMPLANG::Mosama_Goals.singular'),
+        ]);
         AMER::addFields([
             [
-                'name'=>'text',
-                'type'=>'text',
-                'label'=>trans('EMPLANG::Mosama_Goals.singular'),
+                'type'                  =>'select2_from_ajax',
+                'name'                  =>'Mosama_Groups',
+                'placeholder'           =>trans('EMPLANG::Mosama_Groups.singular'),
+                'label'                 =>trans('EMPLANG::Mosama_Groups.singular'),
+                'entity'                =>'Mosama_Groups',
+                'model'                 =>'Amerhendy\Employers\App\Models\Mosama_Groups',
+                'data_source'           =>$routes['fetchMosama_Groups']['as'],
+                //'dependencies'=>false,
+                'minimum_input_length'  =>0,
+                'attribute'             =>'text',
+                'select_all'            =>true,
             ],
-                        [
-                        'type'=>'select2_from_ajax',
-                        'model'=>'Amerhendy\Employers\App\Models\Mosama_Groups',
-                        'name'=>'Mosama_Groups',
-                        'placeholder'=>trans('EMPLANG::Mosama_Groups.singular'),
-                        'label'=>trans('EMPLANG::Mosama_Groups.singular'),
-                        'minimum_input_length'=>0,
-                        'data_source'=>$routes['fetchMosama_Groups']['as'],
-                        'entity'=>'Mosama_Groups',
-                        'attribute'=>'text',
-                        'pivot'=>true,
-                        'select_all'=>true,
-                        'include_all_form_fields' => true,
-                    ],
-                    [
-                        'type'=>'select2_from_ajax',
-                        'model'=>'Amerhendy\Employers\App\Models\Mosama_JobTitles',
-                        'name'=>'Mosama_JobTitles',
-                        'placeholder'=>trans('EMPLANG::Mosama_JobTitles.singular'),
-                        'label'=>trans('EMPLANG::Mosama_JobTitles.singular'),
-                        'minimum_input_length'=>0,
-                        'data_source'=>$routes['fetchMosama_JobTitles']['as'],
-                        'entity'=>'Mosama_JobTitles',
-                        'attribute'=>'text',
-                        'select_all'=>true,
-                        'include_all_form_fields' => true,
-                        'dependencies'            => ['Mosama_Groups'],
-                    ],
-                    [
-                        'type'=>'select2_from_ajax',
-                        'model'=>'Amerhendy\Employers\App\Models\Mosama_JobNames',
-                        'name'=>'Mosama_JobNames',
-                        'placeholder'=>trans('EMPLANG::Mosama_JobNames.singular'),
-                        'label'=>trans('EMPLANG::Mosama_JobNames.singular'),
-                        'minimum_input_length'=>0,
-                        'data_source'=>$routes['fetchMosama_JobNames']['as'],
-                        'entity'=>'Mosama_JobNames',
-                        'attribute'=>'text',
-                        'select_all'=>true,
-                        'include_all_form_fields' => true,
-                    ],
-                ]); 
+            [
+                'type'                  =>'select2_from_ajax',
+                'name'                  =>'Mosama_JobTitles',
+                'placeholder'           =>trans('EMPLANG::Mosama_JobTitles.singular'),
+                'label'                 =>trans('EMPLANG::Mosama_JobTitles.singular'),
+                'entity'                =>'Mosama_JobTitles',
+                'model'                 =>'Amerhendy\Employers\App\Models\Mosama_JobTitles',
+                'data_source'           =>$routes['fetchMosama_JobTitles']['as'],
+                'dependencies'          => ['Mosama_Groups'],
+                'minimum_input_length'  =>0,
+                'attribute'             =>'text',
+                'select_all'            =>true,
+            ],
+            [
+                'type'                  =>'select2_from_ajax',
+                'name'                  =>'Mosama_JobNames',
+                'placeholder'           =>trans('EMPLANG::Mosama_JobNames.singular'),
+                'label'                 =>trans('EMPLANG::Mosama_JobNames.singular'),
+                'entity'                =>'Mosama_JobNames',
+                'model'                 =>'Amerhendy\Employers\App\Models\Mosama_JobNames',
+                'data_source'           =>$routes['fetchMosama_JobNames']['as'],
+                'dependencies'          => ['Mosama_JobTitles'],
+                'minimum_input_length'  =>0,
+                'attribute'             =>'text',
+                'select_all'            =>true,
+            ]
+                ]);
     }
     protected function setupCreateOperation()
     {
@@ -136,17 +132,6 @@ class Mosama_CompetenciesAmerController extends AmerController
     {
         AMER::setValidation(Mosama_CompetenciesRequest::class);
         $this->fields();
-    }
-    public function store(Mosama_CompetenciesRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     public function destroy($id)
     {
@@ -160,35 +145,37 @@ class Mosama_CompetenciesAmerController extends AmerController
     }
     public function fetchMosama_JobTitles()
     {
-        
+
         $model=\Amerhendy\Employers\App\Models\Mosama_JobTitles::class;
         $text='Mosama_Groups';
-        $result=\AmerHelper::retunFetchValue($_GET,$text);
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
             'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
             'query' => function($model)use($result,$text) {
                 return $model->whereHas($text,function($q)use($result,$text){
-                    return $q->whereIn($text.'.id',$result);
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
     }
     public function fetchMosama_JobNames()
     {
         $model=\Amerhendy\Employers\App\Models\Mosama_JobNames::class;
         $text='Mosama_JobTitles';
-        $result=\AmerHelper::retunFetchValue($_GET,$text);
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
             'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
             'query' => function($model)use($result,$text) {
                 return $model->whereHas($text,function($q)use($result,$text){
-                    return $q->whereIn($text.'.id',$result);
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
     }
 }

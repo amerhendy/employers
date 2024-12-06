@@ -9,8 +9,8 @@ use \Amerhendy\Employers\App\Http\Requests\CareerPath\Employers_CareerPathFilesR
 class Employers_CareerPathFilesAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -26,9 +26,8 @@ class Employers_CareerPathFilesAmerController extends AmerController
             Employers_CareerPathFiles::create(['Text'=>trans('EMPLANG::Employers_CareerPathFiles.singular').' :: '.$i,'Link'=>'http://www.link.com/'.$i]);
         }*/
         AMER::setModel(Employers_CareerPathFiles::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Employers_CareerPathFiles');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Employers_CareerPathFiles');
         AMER::setEntityNameStrings(trans('EMPLANG::Employers_CareerPathFiles.singular'), trans('EMPLANG::Employers_CareerPathFiles.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Employers_CareerPathFiles.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Employers_CareerPathFiles.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Employers_CareerPathFiles.create'), 'create');
@@ -38,12 +37,11 @@ class Employers_CareerPathFilesAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Employers_CareerPathFiles-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Employers_CareerPathFiles-create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Employers_CareerPathFiles-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Employers_CareerPathFiles-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Employers_CareerPathFiles-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Employers_CareerPathFiles-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
     protected function setupShowOperation()
     {
@@ -74,7 +72,7 @@ class Employers_CareerPathFilesAmerController extends AmerController
                 'type'=>'url',
                 'label'=>trans('EMPLANG::Employers_CareerPathFiles.Link'),
             ],
-                ]); 
+                ]);
     }
     protected function setupCreateOperation()
     {
@@ -85,17 +83,6 @@ class Employers_CareerPathFilesAmerController extends AmerController
     {
         AMER::setValidation(Employers_CareerPathFilesRequest::class);
         $this->fields();
-    }
-    public function store(Employers_CareerPathFilesRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     public function destroy($id)
     {
@@ -109,7 +96,7 @@ class Employers_CareerPathFilesAmerController extends AmerController
     }
     public function fetchMosama_JobTitles()
     {
-        
+
         $model=\Amerhendy\Employers\App\Models\Mosama_JobTitles::class;
         $text='Mosama_Groups';
         $result=\AmerHelper::retunFetchValue($_GET,$text);
@@ -121,7 +108,7 @@ class Employers_CareerPathFilesAmerController extends AmerController
                 return $model->whereHas($text,function($q)use($result,$text){
                     return $q->whereIn($text.'.id',$result);
                 });
-            } 
+            }
         ]);
     }
     public function fetchMosama_JobNames()
@@ -137,7 +124,7 @@ class Employers_CareerPathFilesAmerController extends AmerController
                 return $model->whereHas($text,function($q)use($result,$text){
                     return $q->whereIn($text.'.id',$result);
                 });
-            } 
+            }
         ]);
     }
 }

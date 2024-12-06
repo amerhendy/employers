@@ -10,12 +10,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Mosama_JobNames extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Mosama_JobNames";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="mosama_jobnames";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -24,14 +24,6 @@ class Mosama_JobNames extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -49,67 +41,66 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Mosama_Competencies(){
-        return $this->belongsToMany(Mosama_Competencies::class,"Mosama_JobName_Competencies",'JobName_id','Competence_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Competencies::class,"mosama_jobnames_competencies",'jobname_id','competence_id')->withTrashed();
     }
-    function Mosama_JobName_Competencies(){
-        return $this->belongsToMany(Mosama_Competencies::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_competencies(){
+        return $this->belongsToMany(Mosama_Competencies::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Connections(){
-        return $this->belongsToMany(Mosama_Connections::class,"Mosama_JobName_Connections",'JobName_id','Connection_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Connections::class,"mosama_jobnames_connections",'jobname_id','connection_id')->withTrashed();
     }
-    function Mosama_JobName_Connections(){
-        return $this->belongsToMany(Mosama_Connections::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_connections(){
+        return $this->belongsToMany(Mosama_Connections::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Educations(){
-        return $this->belongsToMany(Mosama_Educations::class,"Mosama_JobName_Educations",'JobName_id','Education_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Educations::class,"mosama_jobnames_educations",'jobname_id','education_id')->withTrashed();
     }
-    function Mosama_JobName_Educations(){
-        return $this->belongsToMany(Mosama_Educations::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_educations(){
+        return $this->belongsToMany(Mosama_Educations::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Experiences(){
-        return $this->belongsToMany(Mosama_Experiences::class,"Mosama_JobName_Experiences",'JobName_id','Experience_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Experiences::class,"mosama_jobnames_experiences",'jobname_id','experience_id')->withTrashed();
     }
-    function Mosama_JobName_Experiences(){
-        return $this->belongsToMany(Mosama_Experiences::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_experiences(){
+        return $this->belongsToMany(Mosama_Experiences::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Goals(){
-        return $this->belongsToMany(Mosama_Goals::class,"Mosama_JobName_Goals",'JobName_id','Goal_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Goals::class,"mosama_jobnames_goals",'jobname_id','goal_id')->withTrashed();
     }
-    function Mosama_JobName_Goals(){
-        return $this->belongsToMany(Mosama_Goals::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_goals(){
+        return $this->belongsToMany(Mosama_Goals::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Managers(){
-        return $this->belongsToMany(Mosama_Managers::class,"Mosama_JobName_Managers",'JobName_id','Manager_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Managers::class,"mosama_jobnames_managers",'jobname_id','manager_id')->withTrashed();
     }
-    function Mosama_JobName_Managers(){
-        return $this->belongsToMany(Mosama_Managers::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_managers(){
+        return $this->belongsToMany(Mosama_Managers::class,"mosama_jobnames",'id','id');
     }
     function Mosama_OrgStruses(){
-        return $this->belongsToMany(Mosama_OrgStruses::class,"Mosama_JobName_OrgStru",'JobName_id','OrgStru_id')->withTrashed();
+        return $this->belongsToMany(Mosama_OrgStruses::class,"mosama_jobnames_orgstrus",'jobname_id','orgstru_id')->withTrashed();
     }
-    function Mosama_JobName_OrgStru(){
-        return $this->belongsToMany(Mosama_OrgStruses::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_orgstrus(){
+        return $this->belongsToMany(Mosama_OrgStruses::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Skills(){
-        return $this->belongsToMany(Mosama_Skills::class,"Mosama_JobName_Skills",'JobName_id','Skill_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Skills::class,"mosama_jobnames_skills",'jobname_id','skill_id')->withTrashed();
     }
-    function Mosama_JobName_Skills(){
-        return $this->belongsToMany(Mosama_Skills::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_skills(){
+        return $this->belongsToMany(Mosama_Skills::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Tasks(){
-        return $this->belongsToMany(Mosama_Tasks::class,"Mosama_JobName_Tasks",'JobName_id','Task_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Tasks::class,"mosama_jobnames_tasks",'jobname_id','task_id')->withTrashed();
     }
-    function Mosama_JobName_Tasks(){
-        return $this->belongsToMany(Mosama_Tasks::class,"Mosama_JobNames",'id','id');
+    function mosama_jobnames_tasks(){
+        return $this->belongsToMany(Mosama_Tasks::class,"mosama_jobnames",'id','id');
     }
     function Mosama_Groups(){
-        return $this->hasOne(Mosama_Groups::class,'id','Group_id');
+        return $this->hasOne(Mosama_Groups::class,'id','group_id');
     }
     function Mosama_JobTitles(){
-        return $this->hasOne(Mosama_JobTitles::class,'id','JobTitle_id');
+        return $this->hasOne(Mosama_JobTitles::class,'id','jobtitle_id');
     }
-    
     function Mosama_Degrees(){
-        return $this->hasOne(Mosama_Degrees::class,'id','Degree_id');
+        return $this->hasOne(Mosama_Degrees::class,'id','degree_id');
     }
 }

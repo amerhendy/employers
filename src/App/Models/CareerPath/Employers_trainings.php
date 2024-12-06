@@ -10,11 +10,11 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Employers_trainings extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
     protected $table ="Employers_trainings";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
@@ -57,7 +57,7 @@ public function sluggable(): array
         return $this->belongsToMany(\Amerhendy\Employers\App\Models\Mosama_Groups::class,"Employers_trainings",'id','id');
     }
     function Mosama_Groups(){
-        return $this->belongsToMany(\Amerhendy\Employers\App\Models\Mosama_Groups::class,"Mosama_Groups_CareerPath",'CareerPath_id','Group_id')->withTrashed();
+        return $this->belongsToMany(\Amerhendy\Employers\App\Models\Mosama_Groups::class,"Mosama_Groups_CareerPath",'CareerPath_id','group_id')->withTrashed();
     }
     function Employers_training(){
         return $this->belongsToMany(\Amerhendy\Employers\App\Models\Employers::class,"Employers_trainings",'id','id');

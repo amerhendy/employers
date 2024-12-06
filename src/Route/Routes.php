@@ -5,21 +5,21 @@ use Illuminate\Support\Facades\Auth;
 /////////////////////////////ui///////////////////////////
 Route::group(
     [
-        'prefix'     =>config('Amer.employers.route_prefix','Employers'),
-        'namespace'  =>config('Amer.employers.Controllers'),
-        'middleware' => config('Amer.amer.web_middleware', 'web'),
-        'name'=>config('Amer.employer.routeName_prefix','Employers.'),
+        'prefix'     =>config('Amer.Employers.route_prefix','Employers'),
+        'namespace'  =>config('Amer.Employers.Controllers'),
+        'middleware' => config('Amer.Amer.web_middleware', 'web'),
+        'name'=>config('Amer.Employers.routeName_prefix','Employers.'),
     ],function(){
         Route::post('Employer/login', 'Auth\LoginController@login')->name('Employer.login.api');
         Route::POST('Mosama/Mosama_print','MosamaAmerController')->name('Mosama_print.index');
-        Route::post('MosamaPrint','api\MosamaCollection@showprintjobname')->name('showprintjobname');
+
     }
 );
 Route::group(
     [
-        'prefix'     =>config('Amer.employers.route_prefix'),
-        'namespace'  =>config('Amer.employers.Controllers'),
-        'middleware' =>array_merge((array) config('Amer.amer.web_middleware'),(array) config('Amer.employers.auth.middleware_key')),
+        'prefix'     =>config('Amer.Employers.route_prefix'),
+        'namespace'  =>config('Amer.Employers.Controllers'),
+        'middleware' =>array_merge((array) config('Amer.Amer.web_middleware'),(array) config('Amer.Employers.auth.middleware_key')),
         'name'=>'Employer.',
     ],
     function(){
@@ -28,18 +28,18 @@ Route::group(
 });
 ////////////////////////////////////////////////////////////// admin area ////////////////////////////////////////////////
 Route::group([
-    'namespace'  =>config('Amer.employers.Controllers'),
+    'namespace'  =>config('Amer.Employers.Controllers'),
 ], function () {
     //Route::get('/',"Auth\Employers@index")->middleware(['web'])->name('home');
     Route::get('/Employers',"Auth\Employers@index")->middleware(['web'])->name('employerdashboard');
-    Route::get('/RegulationsCollections',"api\RegulationsCollection@index")->middleware(['web'])->name('RegulationsCollection');
+    Route::get('/RegulationsCollections',"api\RegulationsCollection@index")->middleware(['web'])->name('RegulationsCollections');
 });
 Route::group(
     [
-        'prefix'     =>config('Amer.employers.route_prefix','Employers'),
-        'namespace'  =>config('Amer.employers.Controllers'),
-        'middleware' =>array_merge((array) config('Amer.amer.web_middleware'),(array) config('Amer.Security.auth.middleware_key')),
-        'name'=>config('Amer.employer.routeName_prefix','Employers.'),
+        'prefix'     =>config('Amer.Employers.route_prefix','Employers'),
+        'namespace'  =>config('Amer.Employers.Controllers'),
+        'middleware' =>array_merge((array) config('Amer.Amer.web_middleware'),(array) config('Amer.Security.auth.middleware_key')),
+        'name'=>config('Amer.Employers.routeName_prefix','Employers.'),
     ],
     function(){
         Route::GET('Mosama','MosamaAmerController')->name('Mosama.index');

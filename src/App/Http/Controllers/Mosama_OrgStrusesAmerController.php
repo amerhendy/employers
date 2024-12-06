@@ -9,8 +9,8 @@ use Amerhendy\Employers\App\Http\Requests\Mosama_OrgStrusesRequest as Mosama_Org
 class Mosama_OrgStrusesAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -18,13 +18,12 @@ class Mosama_OrgStrusesAmerController extends AmerController
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkCloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkDeleteOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation; 
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation;
     public function setup()
     {
         AMER::setModel(Mosama_OrgStruses::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Mosama_OrgStruses');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Mosama_OrgStruses');
         AMER::setEntityNameStrings(trans('EMPLANG::Mosama_OrgStruses.singular'), trans('EMPLANG::Mosama_OrgStruses.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Mosama_OrgStruses.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Mosama_OrgStruses.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Mosama_OrgStruses.create'), 'create');
@@ -34,12 +33,11 @@ class Mosama_OrgStrusesAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Mosama_OrgStruses-add') == 0){$this->Amer->denyAccess('create');}
-        if(amer_user()->can('Mosama_OrgStruses-trash') == 0){$this->Amer->denyAccess ('trash');}
-        if(amer_user()->can('Mosama_OrgStruses-update') == 0){$this->Amer->denyAccess('update');}
-        if(amer_user()->can('Mosama_OrgStruses-delete') == 0){$this->Amer->denyAccess('delete');}
-        if(amer_user()->can('Mosama_OrgStruses-show') == 0){$this->Amer->denyAccess('show');}
-        */
+        if(amer_user()->canper('Mosama_OrgStruses-Create') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->canper('Mosama_OrgStruses-trash') == 0){$this->Amer->denyAccess ('trash');}
+        if(amer_user()->canper('Mosama_OrgStruses-update') == 0){$this->Amer->denyAccess('update');}
+        if(amer_user()->canper('Mosama_OrgStruses-delete') == 0){$this->Amer->denyAccess('delete');}
+        if(amer_user()->canper('Mosama_OrgStruses-show') == 0){$this->Amer->denyAccess('show');}
     }
     function cols(){
         AMER::addColumns([
@@ -121,16 +119,16 @@ class Mosama_OrgStrusesAmerController extends AmerController
                     'select_all'=>true,
                     'include_all_form_fields' => true,
                 ],
-            ]); 
+            ]);
 }
-    
+
     protected function setupListOperation(){
         $this->cols();
     }
     protected function setupShowOperation(){
         $this->cols();
     }
-    
+
     protected function setupCreateOperation()
     {
         AMER::setValidation(Mosama_OrgStrusesRequest::class);
@@ -141,17 +139,7 @@ class Mosama_OrgStrusesAmerController extends AmerController
         AMER::setValidation(Mosama_OrgStrusesRequest::class);
         $this->fields();
     }
-    public function store(Mosama_OrgStrusesRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
-    }
+
     public function destroy($id)
     {
         $this->Amer->hasAccessOrFail('delete');
@@ -166,34 +154,36 @@ class Mosama_OrgStrusesAmerController extends AmerController
     {
         $model=\Amerhendy\Employers\App\Models\Mosama_JobTitles::class;
         $text='Mosama_Groups';
-        $result=\AmerHelper::retunFetchValue($_GET,$text);
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
             'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
             'query' => function($model)use($result,$text) {
                 return $model->whereHas($text,function($q)use($result,$text){
-                    return $q->whereIn($text.'.id',$result);
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
-        
+
     }
     public function fetchMosama_JobNames()
     {
-        
+
         $model=\Amerhendy\Employers\App\Models\Mosama_JobNames::class;
         $text='Mosama_JobTitles';
-        $result=\AmerHelper::retunFetchValue($_GET,$text);
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
             'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
             'query' => function($model)use($result,$text) {
                 return $model->whereHas($text,function($q)use($result,$text){
-                    return $q->whereIn($text.'.id',$result);
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
     }
 }

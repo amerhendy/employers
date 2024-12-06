@@ -9,8 +9,8 @@ use Amerhendy\Employers\App\Http\Requests\Mosama_TasksRequest as Mosama_TasksReq
 class Mosama_TasksAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -18,13 +18,12 @@ class Mosama_TasksAmerController extends AmerController
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkCloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkDeleteOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation; 
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation;
     public function setup()
     {
         AMER::setModel(Mosama_Tasks::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Mosama_Tasks');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Mosama_Tasks');
         AMER::setEntityNameStrings(trans('EMPLANG::Mosama_Tasks.singular'), trans('EMPLANG::Mosama_Tasks.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Mosama_Tasks.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Mosama_Tasks.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Mosama_Tasks.create'), 'create');
@@ -34,13 +33,12 @@ class Mosama_TasksAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Mosama_Tasks-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Mosama_Tasks-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Mosama_Tasks-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Mosama_Tasks-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Mosama_Tasks-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Mosama_Tasks-show') == 0){$this->Amer->denyAccess('show');}
-        */
-    }       
+    }
     function cols(){
         AMER::addColumns([
             [
@@ -92,7 +90,7 @@ class Mosama_TasksAmerController extends AmerController
                     'attribute'=>'text',
                     'pivot'=>true,
                     'select_all'=>true,
-                    'include_all_form_fields' => true,
+                    //'include_all_form_fields' => true,
                 ],
                 [
                     'type'=>'select2_from_ajax',
@@ -105,7 +103,7 @@ class Mosama_TasksAmerController extends AmerController
                     'entity'=>'Mosama_JobTitles',
                     'attribute'=>'text',
                     'select_all'=>true,
-                    'include_all_form_fields' => true,
+                    //'include_all_form_fields' => true,
                     'dependencies'            => ['Mosama_Groups'],
                 ],
                 [
@@ -119,9 +117,10 @@ class Mosama_TasksAmerController extends AmerController
                     'entity'=>'Mosama_JobNames',
                     'attribute'=>'text',
                     'select_all'=>true,
-                    'include_all_form_fields' => true,
+                    'dependencies'            => ['Mosama_JobTitles'],
+                    //'include_all_form_fields' => true,
                 ],
-            ]); 
+            ]);
 }
     protected function setupListOperation(){
         $this->cols();
@@ -139,17 +138,6 @@ class Mosama_TasksAmerController extends AmerController
         AMER::setValidation(Mosama_TasksRequest::class);
         $this->fields();
     }
-    public function store(Mosama_TasksRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
-    }
     public function destroy($id)
     {
         $this->Amer->hasAccessOrFail('delete');
@@ -162,46 +150,37 @@ class Mosama_TasksAmerController extends AmerController
     }
     public function fetchMosama_JobTitles()
     {
-        $op=$_GET;
-        if(isset($op['parents'])){
-            $parents=$op['parents'];
-            if(isset($parents['Mosama_Groups'])){
-                $Group_id=$parents['Mosama_Groups'];
-            }
-        }else{
-            $Group_id=null;
-        }
+
+        $model=\Amerhendy\Employers\App\Models\Mosama_JobTitles::class;
+        $text='Mosama_Groups';
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
-            'model' =>\Amerhendy\Employers\App\Models\Mosama_JobTitles::class,
+            'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
-            'query' => function($model)use($Group_id) {
-                return $model->whereHas('Mosama_Groups',function($query)use($Group_id){
-                    return $query->whereIn('Mosama_Groups.id',$Group_id);
+            'query' => function($model)use($result,$text) {
+                return $model->whereHas($text,function($q)use($result,$text){
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
     }
     public function fetchMosama_JobNames()
     {
-        $op=$_GET;
-        if(isset($op['parents'])){
-            $parents=$op['parents'];
-            if(isset($parents['Mosama_JobTitles'])){
-                $Mosama_JobTitles=$parents['Mosama_JobTitles'];
-            }
-        }else{
-            $Mosama_JobTitles=null;
-        }
+        $model=\Amerhendy\Employers\App\Models\Mosama_JobNames::class;
+        $text='Mosama_JobTitles';
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
-            'model' =>\Amerhendy\Employers\App\Models\Mosama_JobNames::class,
+            'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
-            'query' => function($model)use($Mosama_JobTitles) {
-                return $model->whereHas('Mosama_JobTitles',function($q)use($Mosama_JobTitles){
-                    return $q->whereIn('Mosama_JobTitles.id',$Mosama_JobTitles);
+            'query' => function($model)use($result,$text) {
+                return $model->whereHas($text,function($q)use($result,$text){
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
     }
 }

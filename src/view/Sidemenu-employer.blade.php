@@ -6,7 +6,7 @@
             <i class="fas fa-sitemap"></i>الاضافات الاساسية
         </button>
             <div class="collapse list-group list-group-flush" id="basemosamiat-collapse" style="">
-                    <!-- {{Employer_url('Mosama_Goals')}} --><a href="{{Employer_url('Mosama_Goals')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_Goals.Mosama_Goals')}}</a>
+                        <!-- {{Employer_url('Mosama_Goals')}} --><a href="{{Employer_url('Mosama_Goals')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_Goals.Mosama_Goals')}}</a>
                         <!-- {{Employer_url('Mosama_Competencies')}} --><a href="{{Employer_url('Mosama_Competencies')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_Competencies.Mosama_Competencies')}}</a>
                         <!-- {{Employer_url('Mosama_Connections')}} --><a href="{{Employer_url('Mosama_Connections')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_Connections.Mosama_Connections')}}</a>
                         <!-- {{Employer_url('Mosama_Degrees')}} --><a href="{{Employer_url('Mosama_Degrees')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_Degrees.Mosama_Degrees')}}</a>
@@ -19,8 +19,8 @@
                         <!-- {{Employer_url('Mosama_Tasks')}} --><a href="{{Employer_url('Mosama_Tasks')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_Tasks.Mosama_Tasks')}}</a>
             </div>
             <!-- {{Employer_url('Mosama_Groups')}} --><a href="{{Employer_url('Mosama_Groups')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_Groups.Mosama_Groups')}}</a>
-<!-- {{Employer_url('Mosama_JobNames')}} --><a href="{{Employer_url('Mosama_JobNames')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_JobNames.Mosama_JobNames')}}</a>
 <!-- {{Employer_url('Mosama_JobTitles')}} --><a href="{{Employer_url('Mosama_JobTitles')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_JobTitles.Mosama_JobTitles')}}</a>
+<!-- {{Employer_url('Mosama_JobNames')}} --><a href="{{Employer_url('Mosama_JobNames')}}" class="list-group-item list-group-item-action"><span class="fab fa-servicestack"></span>{{trans('EMPLANG::Mosama_JobNames.Mosama_JobNames')}}</a>
 <!-- {{Employer_url('admin.Mosama.index')}} --><a href="{{route('Mosama.index')}}" class="list-group-item list-group-item-action"><i class="fa fa-eye" aria-hidden="true"></i>عرض</a>
     </div>
 

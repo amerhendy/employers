@@ -8,8 +8,8 @@ use Amerhendy\Employers\App\Http\Requests\Regulations_TopicsRequest as Regulatio
 class Regulations_TopicsAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -21,9 +21,8 @@ class Regulations_TopicsAmerController extends AmerController
     public function setup()
     {
         AMER::setModel(Regulations_Topics::class);
-        AMER::setRoute(config('amer.route_prefix') . '/Regulations_Topics');
+        AMER::setRoute(config('Amer.Amer.route_prefix') . '/Regulations_Topics');
         AMER::setEntityNameStrings(trans('EMPLANG::Regulations_Topics.singular'), trans('EMPLANG::Regulations_Topics.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Regulations_Topics.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Regulations_Topics.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Regulations_Topics.create'), 'create');
@@ -33,12 +32,11 @@ class Regulations_TopicsAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Regulations_Topics-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Regulations_Topics-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Regulations_Topics-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Regulations_Topics-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Regulations_Topics-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Regulations_Topics-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
     public function cols(){
         AMER::addColumns([
@@ -74,7 +72,7 @@ class Regulations_TopicsAmerController extends AmerController
             ],
         ]);
     }
-    
+
     function groupfields(){
         AMER::addFields([
             [
@@ -114,7 +112,7 @@ class Regulations_TopicsAmerController extends AmerController
         if (! $this->Amer->getRequest()->has('order')){
             $this->Amer->orderBy('father');
         }
-        
+
         $this->cols();
     }
     protected function setupShowOperation()
@@ -130,17 +128,6 @@ class Regulations_TopicsAmerController extends AmerController
     {
         AMER::setValidation(Regulations_TopicsRequest::class);
         $this->groupfields();
-    }
-    public function store(Regulations_TopicsRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
     }
     public function destroy($id)
     {
@@ -174,7 +161,7 @@ class Regulations_TopicsAmerController extends AmerController
                 return $model->whereHas('Regulation',function($q)use($Regulations){
                     return $q->whereIn('Regulations.id',$Regulations);
                 });
-            } 
+            }
         ]);
         return $this->fetch(['model'=>\Amerhendy\Employers\App\Models\Regulations\Regulations_Topics::class,'searchable_attributes'=>'text']);
     }

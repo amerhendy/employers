@@ -9,28 +9,18 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class OrgStru_Mahatas extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table = 'OrgStru_Mahatas';
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table = "orgstru_mahatas";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
     public $timestamps = true;
     protected $fillable = [];
     protected $dates = ['deleted_at'];
-    public static $list=[];
-    public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -48,12 +38,12 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function OrgStru_Sections(){
-        return $this->belongsTo(OrgStru_Sections::class,'Section_id','id')->withTrashed();
+        return $this->belongsTo(OrgStru_Sections::class,'section_id','id')->withTrashed();
     }
     function OrgStru_Areas(){
-        return $this->belongsTo(OrgStru_Areas::class,'Area_id','id')->withTrashed();
+        return $this->belongsTo(OrgStru_Areas::class,'area_id','id')->withTrashed();
     }
     function OrgStru_Types(){
-        return $this->belongsTo(OrgStru_Types::class,'Types_id','id')->withTrashed();
+        return $this->belongsTo(OrgStru_Types::class,'types_id','id')->withTrashed();
     }
 }

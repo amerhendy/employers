@@ -10,25 +10,17 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Mosama_Goals extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Mosama_Goals";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="mosama_goals";
     protected $guarded = ['id'];
     public $incrementing = false;
     public $timestamps = true;
     protected $fillable = ['id','text'];
     protected $dates = ['deleted_at'];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -46,21 +38,21 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Mosama_Groups(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Groups_Goals",'Goal_id','Group_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_groups_goals",'goal_id','group_id')->withTrashed();
     }
-    function Mosama_Groups_Goals(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Goals",'id','id');
+    function mosama_groups_goals(){
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_goals",'id','id');
     }
     function Mosama_JobTitles(){
-        return $this->belongsToMany(Mosama_JobTitles::class,"Mosama_JobTitles_Goals",'Goal_id','JobTitle_id')->withTrashed();
+        return $this->belongsToMany(Mosama_JobTitles::class,"mosama_jobtitles_goals",'goal_id','jobtitle_id')->withTrashed();
     }
-    function Mosama_JobTitles_Goals(){
-        return $this->belongsToMany(Mosama_JobTitles::class,"Mosama_Goals",'id','id');
+    function mosama_jobtitles_goals(){
+        return $this->belongsToMany(Mosama_JobTitles::class,"mosama_goals",'id','id');
     }
     function Mosama_JobNames(){
-        return $this->belongsToMany(Mosama_JobNames::class,"Mosama_JobName_Goals",'Goal_id','JobName_id')->withTrashed();
+        return $this->belongsToMany(Mosama_JobNames::class,"mosama_jobnames_goals",'goal_id','jobname_id')->withTrashed();
     }
-    function Mosama_JobName_Goals(){
-        return $this->belongsToMany(Mosama_JobNames::class,"Mosama_Goals",'id','id');
+    function mosama_jobnames_goals(){
+        return $this->belongsToMany(Mosama_JobNames::class,"mosama_goals",'id','id');
     }
 }

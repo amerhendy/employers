@@ -10,12 +10,12 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+use Illuminate\Database\Eloquent\Casts\Attribute;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Mosama_Experiences extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Mosama_Experiences";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="mosama_experiences";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -24,14 +24,6 @@ class Mosama_Experiences extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -49,21 +41,38 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Mosama_Degrees(){
-        return $this->belongsToMany(Mosama_Degrees::class,"Mosama_Degrees_Experiences",'Experience_id','Degree_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Degrees::class,"mosama_degrees_experiences",'experience_id','degree_id')->withTrashed();
     }
-    function Mosama_Degrees_Experiences(){
-        return $this->belongsToMany(Mosama_Degrees::class,"Mosama_Experiences",'id','id');
+    function mosama_degrees_experiences(){
+        return $this->belongsToMany(Mosama_Degrees::class,"mosama_experiences",'id','id');
     }
     function Mosama_Groups(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Groups_Experiences",'Experience_id','Group_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_groups_experiences",'experience_id','group_id')->withTrashed();
     }
-    function Mosama_Groups_Experiences(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Experiences",'id','id');
+    function mosama_groups_experiences(){
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_experiences",'id','id');
     }
     function Mosama_JobNames(){
-        return $this->belongsToMany(Mosama_JobNames::class,"Mosama_JobName_Experiences",'Experience_id','JobName_id')->withTrashed();
+        return $this->belongsToMany(Mosama_JobNames::class,"mosama_jobnames_experiences",'experience_id','jobname_id')->withTrashed();
     }
-    function Mosama_JobName_Experiences(){
-        return $this->belongsToMany(Mosama_JobNames::class,"Mosama_Experiences",'id','id');
+    function mosama_jobnames_experiences(){
+        return $this->belongsToMany(Mosama_JobNames::class,"mosama_experiences",'id','id');
+    }
+    public function text(): Attribute
+    {
+        return Attribute::make(
+            get: function (mixed $value, array $attributes){
+                if($attributes['time'] === 0 || $attributes['time'] === '0'){
+                    return __('EMPLANG::Mosama_Experiences.year0');
+                }else{
+                    return __('EMPLANG::Mosama_Experiences.LaravelTranslate',
+                    [
+                        'type'=>__('EMPLANG::Mosama_Experiences.enum_'.$attributes['type']),
+                        'year'=>$attributes['time']
+                    ]
+                );
+                }
+            }
+        );
     }
 }

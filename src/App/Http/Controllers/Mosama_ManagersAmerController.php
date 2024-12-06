@@ -9,8 +9,8 @@ use Amerhendy\Employers\App\Http\Requests\Mosama_ManagersRequest as Mosama_Manag
 class Mosama_ManagersAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -18,13 +18,12 @@ class Mosama_ManagersAmerController extends AmerController
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkCloneOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\BulkDeleteOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation; 
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\FetchOperation;
     public function setup()
     {
         AMER::setModel(Mosama_Managers::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Mosama_Managers');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Mosama_Managers');
         AMER::setEntityNameStrings(trans('EMPLANG::Mosama_Managers.singular'), trans('EMPLANG::Mosama_Managers.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Mosama_Managers.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Mosama_Managers.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Mosama_Managers.create'), 'create');
@@ -34,12 +33,11 @@ class Mosama_ManagersAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Mosama_Managers-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Mosama_Managers-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Mosama_Managers-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Mosama_Managers-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Mosama_Managers-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Mosama_Managers-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
 function cols(){
     AMER::addColumns([
@@ -101,13 +99,13 @@ AMER::addField([
     'attribute'=>'text',
     'pivot'=>true,
     'entity_secondary' => ['Mosama_JobTitles','Mosama_JobNames'],
-]); 
+]);
 }
 protected function setupListOperation(){
-    $this->cols(); 
+    $this->cols();
  }
  protected function setupShowOperation(){
-    $this->cols(); 
+    $this->cols();
  }
     protected function setupCreateOperation()
     {
@@ -119,17 +117,7 @@ protected function setupListOperation(){
         AMER::setValidation(Mosama_ManagersRequest::class);
         $this->fields();
     }
-    public function store(Mosama_ManagersRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
-    }
+
     public function destroy($id)
     {
         $this->Amer->hasAccessOrFail('delete');
@@ -142,19 +130,20 @@ protected function setupListOperation(){
     }
     public function fetchMosama_JobNames()
     {
-        
+
         $model=\Amerhendy\Employers\App\Models\Mosama_JobNames::class;
         $text='Mosama_Groups';
-        $result=\AmerHelper::retunFetchValue($_GET,$text);
+        $result=\AmerHelper::retunFetchValue($text);
+        if($result === null){return json_encode([]);}
         return $this->fetch([
             'model' =>$model,
             'searchable_attributes' => 'text',
             'paginate' => 10,
             'query' => function($model)use($result,$text) {
                 return $model->whereHas($text,function($q)use($result,$text){
-                    return $q->whereIn($text.'.id',$result);
+                    return $q->whereIn(\Str::lower($text).'.id',$result[$text]);
                 });
-            } 
+            }
         ]);
     }
 }

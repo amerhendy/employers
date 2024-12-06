@@ -7,15 +7,15 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Spatie\Permission\Traits\HasRoles;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Laravel\passport\HasApiTokens;
+use Laravel\Passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 class Regulations_Topics extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Regulations_Topics";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="regulations_topics";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -24,14 +24,6 @@ class Regulations_Topics extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -57,18 +49,18 @@ public function parent()
     return $this->belongsTo('\Amerhendy\Employers\App\Models\Regulations\Regulations_Topics', 'father');
 }
 function Regulation(){
-    return $this->belongsToMany(Regulations::class,"Regulations_Regulation_Topic",'Topic_id','Regulation_id')->withTrashed();
+    return $this->belongsToMany(Regulations::class,"regulations_regulations_topics",'topic_id','regulation_id')->withTrashed();
 }
 function Regulations(){
-    return $this->belongsToMany(Regulations::class,"Regulations_Regulation_Topic",'Topic_id','Regulation_id')->withTrashed();
+    return $this->belongsToMany(Regulations::class,"regulations_regulations_topics",'topic_id','regulation_id')->withTrashed();
 }
-function Regulations_Regulation_Topic(){
-    return $this->belongsToMany(Regulations::class,"Regulations_Topics",'id','id');
+function regulations_regulations_topics(){
+    return $this->belongsToMany(Regulations::class,"regulations_topics",'id','id');
 }
 function Regulations_Articles(){
-    return $this->belongsToMany(Regulations_Articles::class,"Regulations_topic_article",'Topic_id','Article_id')->withTrashed();
+    return $this->belongsToMany(Regulations_Articles::class,"Regulations_topic_article",'topic_id','article_id')->withTrashed();
 }
 function Regulations_topic_article(){
-    return $this->belongsToMany(Regulations_Articles::class,"Regulations_Topics",'id','id');
+    return $this->belongsToMany(Regulations_Articles::class,"regulations_topics",'id','id');
 }
 }

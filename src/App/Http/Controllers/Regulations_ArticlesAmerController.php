@@ -8,8 +8,8 @@ use Amerhendy\Employers\App\Http\Requests\Regulations_ArticlesRequest as Regulat
 class Regulations_ArticlesAmerController extends AmerController
 {
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ListOperation;
-    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
-    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
+    //use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation  {store as traitStore;}
+    use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\CreateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\UpdateOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\DeleteOperation;
     use \Amerhendy\Amer\App\Http\Controllers\Base\Operations\ShowOperation;
@@ -21,9 +21,8 @@ class Regulations_ArticlesAmerController extends AmerController
     public function setup()
     {
         AMER::setModel(Regulations_Articles::class);
-        AMER::setRoute(config('Amer.employers.route_prefix') . '/Regulations_Articles');
+        AMER::setRoute(config('Amer.Employers.route_prefix') . '/Regulations_Articles');
         AMER::setEntityNameStrings(trans('EMPLANG::Regulations_Articles.singular'), trans('EMPLANG::Regulations_Articles.plural'));
-        /*
         $this->Amer->setTitle(trans('EMPLANG::Regulations_Articles.create'), 'create');
         $this->Amer->setHeading(trans('EMPLANG::Regulations_Articles.create'), 'create');
         $this->Amer->setSubheading(trans('EMPLANG::Regulations_Articles.create'), 'create');
@@ -33,12 +32,11 @@ class Regulations_ArticlesAmerController extends AmerController
         $this->Amer->addClause('where', 'deleted_at', '=', null);
         $this->Amer->enableDetailsRow ();
         $this->Amer->allowAccess ('details_row');
-        if(amer_user()->can('Regulations_Articles-add') == 0){$this->Amer->denyAccess('create');}
+        if(amer_user()->can('Regulations_Articles-Create') == 0){$this->Amer->denyAccess('create');}
         if(amer_user()->can('Regulations_Articles-trash') == 0){$this->Amer->denyAccess ('trash');}
         if(amer_user()->can('Regulations_Articles-update') == 0){$this->Amer->denyAccess('update');}
         if(amer_user()->can('Regulations_Articles-delete') == 0){$this->Amer->denyAccess('delete');}
         if(amer_user()->can('Regulations_Articles-show') == 0){$this->Amer->denyAccess('show');}
-        */
     }
 
     protected function setupListOperation(){
@@ -71,7 +69,7 @@ class Regulations_ArticlesAmerController extends AmerController
                 'entity'=>'Regulations_Topics'
             ]
         ]);
-        
+
     }
     function groupfields(){
         AMER::addFields([
@@ -126,17 +124,6 @@ class Regulations_ArticlesAmerController extends AmerController
         AMER::setValidation(Regulations_ArticlesRequest::class);
         $this->groupfields();
     }
-    public function store(Regulations_ArticlesRequest $request)
-    {
-        $table=$this->Amer->model->getTable();
-        $lsid=DB::table($table)->get()->max('id');
-        $id=$lsid+1;
-        $this->Amer->addField(['type' => 'hidden', 'name' => 'id', 'value'=>$id]);
-        $this->Amer->getRequest()->request->add(['id'=> $id]);
-        $this->Amer->setRequest($this->Amer->validateRequest());
-        $this->Amer->unsetValidation();
-        return $this->traitStore();
-    }
     public function destroy($id)
     {
         $this->Amer->hasAccessOrFail('delete');
@@ -168,7 +155,7 @@ class Regulations_ArticlesAmerController extends AmerController
                 return $model->whereHas('Regulation',function($q)use($Regulations){
                     return $q->whereIn('Regulations.id',$Regulations);
                 });
-            } 
+            }
         ]);
         return $this->fetch(['model'=>\Amerhendy\Employers\App\Models\Regulations\Regulations_Topics::class,'searchable_attributes'=>'text']);
     }

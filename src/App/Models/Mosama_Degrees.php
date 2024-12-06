@@ -10,14 +10,14 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\passport\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Amerhendy\Amer\App\Models\Traits\AmerTrait;
-use Cviebrock\EloquentSluggable\Sluggable;
-use Cviebrock\EloquentSluggable\SluggableScopeHelpers;
+
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 
 use Illuminate\Database\Eloquent\Relations\HasOneThrough;
 class Mosama_Degrees extends Model
 {
-    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,Sluggable, SluggableScopeHelpers;
-    protected $table ="Mosama_Degrees";
+    use HasFactory,SoftDeletes,AmerTrait,HasRoles,HasApiTokens,HasUuids;
+    protected $table ="mosama_degrees";
     protected $guarded = ['id'];
     protected $primaryKey = 'id';
     public $incrementing = true;
@@ -26,14 +26,6 @@ class Mosama_Degrees extends Model
     protected $dates = ['deleted_at'];
     public static $list=[];
     public static $fileds=[];
-public function sluggable(): array
-    {
-        return [
-            'slug' => [
-                'source' => [],
-            ],
-        ];
-    }
     /*
     |--------------------------------------------------------------------------
     | FUNCTIONS
@@ -51,15 +43,15 @@ public function sluggable(): array
     |--------------------------------------------------------------------------
     */
     function Mosama_Groups(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Groups_Degrees",'Degree_id','Group_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_groups_degrees",'degree_id','group_id')->withTrashed();
     }
-    function Mosama_Groups_Degrees(){
-        return $this->belongsToMany(Mosama_Groups::class,"Mosama_Degrees",'id','id');
+    function mosama_groups_degrees(){
+        return $this->belongsToMany(Mosama_Groups::class,"mosama_degrees",'id','id');
     }
     function Mosama_Experiences(){
-        return $this->belongsToMany(Mosama_Experiences::class,"Mosama_Degrees_Experiences",'Degree_id','Experience_id')->withTrashed();
+        return $this->belongsToMany(Mosama_Experiences::class,"mosama_degrees_experiences",'degree_id','experience_id')->withTrashed();
     }
-    function Mosama_Degrees_Experiences(){
-        return $this->belongsToMany(Mosama_Experiences::class,"Mosama_Degrees",'id','id');
+    function mosama_degrees_experiences(){
+        return $this->belongsToMany(Mosama_Experiences::class,"mosama_degrees",'id','id');
     }
 }

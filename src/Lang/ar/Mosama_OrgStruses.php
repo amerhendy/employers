@@ -3,10 +3,11 @@
  *  Created By Amer Hendy Language Consol For Laravel
  *      EGYPT -2023
  *     Mosama_OrgStruses
- * 
+ *
  * **********************************************************************************/
 return [
     'Mosama_OrgStruses'=>'الهيكل التنظيمى',
+
     'singular'=>'هيكل تنظيمى',
     'plural'=>'هيكل تنظيمى',
     'create'=>'اضافة للهيكل',
