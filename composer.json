@@ -3,7 +3,7 @@
     "description": "nsscww Employers package",
     "type": "library",
 	"license": "proprietary",
-	"version": "0.0.2.0",
+	"version": "0.0.2",
     "autoload": {
         "psr-4": {
             "Amerhendy\\Employers\\": "src/"
